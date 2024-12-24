@@ -1,0 +1,51 @@
+{% extends 'main_app/base.html' %}
+{% block content %}
+<h2>Ваша корзина</h2>
+
+{% if items %}
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Товар</th>
+        <th>Цена</th>
+        <th>Кол-во</th>
+        <th>Стоимость</th>
+        <th>Действие</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in items %}
+      <tr>
+        <td>{{ item.flower.name }}</td>
+        <td>{{ item.flower.price }} руб.</td>
+        <td>
+          <!-- Вывод количества -->
+          {{ item.qty }}
+        </td>
+        <td>{{ item.cost }} руб.</td>
+        <td>
+          <!-- Кнопки + и - для изменения количества -->
+          <form method="post" action="{% url 'orders:update_cart_item' item.flower.id %}" style="display: inline-block;">
+            {% csrf_token %}
+            <button name="action" value="minus" type="submit" class="btn btn-sm btn-outline-secondary">-</button>
+          </form>
+          <form method="post" action="{% url 'orders:update_cart_item' item.flower.id %}" style="display: inline-block;">
+            {% csrf_token %}
+            <button name="action" value="plus" type="submit" class="btn btn-sm btn-outline-secondary">+</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <p><strong>Итого:</strong> {{ total_sum }} руб.</p>
+  <form method="post" action="{% url 'orders:checkout' %}">
+    {% csrf_token %}
+    <button class="btn btn-primary">Оформить заказ</button>
+  </form>
+{% else %}
+  <p>Корзина пуста</p>
+{% endif %}
+
+{% endblock %}
+

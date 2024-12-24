@@ -1,0 +1,18 @@
+{% extends 'main_app/base.html' %}
+{% block content %}
+<h2>История заказов</h2>
+{% for o in orders %}
+  <div class="card mb-2">
+    <div class="card-body">
+      <h5>Заказ #{{ o.id }} ({{ o.get_status_display }})</h5>
+      <p>Дата заказа: {{ o.created_at }}</p>
+      <p>
+        Цветы:
+        {% for flower in o.flowers.all %}
+          {{ flower.name }} ({{ flower.price }} руб.){% if not forloop.last %}, {% endif %}
+        {% endfor %}
+      </p>
+    </div>
+  </div>
+{% endfor %}
+{% endblock %}

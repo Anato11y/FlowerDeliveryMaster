@@ -1,0 +1,26 @@
+{% extends 'main_app/base.html' %}
+{% block content %}
+<h2>Аналитика и отчёты</h2>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Заказ</th>
+      <th>Дата</th>
+      <th>Продажи</th>
+      <th>Прибыль</th>
+      <th>Расходы</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for r in reports %}
+    <tr>
+      <td>#{{ r.order.id }}</td>
+      <td>{{ r.date }}</td>
+      <td>{{ r.sales_data }} руб.</td>
+      <td>{{ r.profit }} руб.</td>
+      <td>{{ r.expenses }} руб.</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

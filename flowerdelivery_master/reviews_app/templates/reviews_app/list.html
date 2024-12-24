@@ -1,0 +1,14 @@
+{% extends 'main_app/base.html' %}
+{% block content %}
+<h2>Отзывы</h2>
+<a href="{% url 'reviews:add' %}" class="btn btn-primary mb-3">Оставить отзыв</a>
+{% for r in reviews %}
+<div class="card mb-2">
+  <div class="card-body">
+    <h5>{{ r.flower.name }} - Оценка: {{ r.rating }}</h5>
+    <p>{{ r.text }}</p>
+    <p><small>От: {{ r.user.username }} | {{ r.created_at }}</small></p>
+  </div>
+</div>
+{% endfor %}
+{% endblock %}
