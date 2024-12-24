@@ -8,7 +8,7 @@ urlpatterns = [
     path('', include('main_app.urls')),
     path('orders/', include('orders_app.urls')),
     path('reviews/', include('reviews_app.urls')),
-    path('analytics/', include('analytics_app.urls', namespace='analytics_app')),
+    path('analytics/', include('analytics_app.urls', namespace='analytics')),
     path('accounts/', include('django.contrib.auth.urls')),
 ]
 if settings.DEBUG:

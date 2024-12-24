@@ -1,26 +1,133 @@
+<!-- analytics_app/templates/analytics_app/dashboard.html -->
+
 {% extends 'main_app/base.html' %}
+
 {% block content %}
-<h2>Аналитика и отчёты</h2>
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <th>Заказ</th>
-      <th>Дата</th>
-      <th>Продажи</th>
-      <th>Прибыль</th>
-      <th>Расходы</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for r in reports %}
-    <tr>
-      <td>#{{ r.order.id }}</td>
-      <td>{{ r.date }}</td>
-      <td>{{ r.sales_data }} руб.</td>
-      <td>{{ r.profit }} руб.</td>
-      <td>{{ r.expenses }} руб.</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+<div class="container mt-5">
+    <h2>Аналитика</h2>
+    <div class="row">
+        <!-- Общие продажи -->
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    Общие Продажи
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ total_sales }} руб.</h5>
+                    <p class="card-text">Общая сумма продаж за всё время.</p>
+                </div>
+            </div>
+        </div>
+        <!-- Общее количество заказов -->
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    Общее Количество Заказов
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ total_orders }}</h5>
+                    <p class="card-text">Общее количество завершённых заказов.</p>
+                </div>
+            </div>
+        </div>
+        <!-- Средняя сумма заказа -->
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    Средняя Сумма Заказа
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ average_order }} руб.</h5>
+                    <p class="card-text">Средняя сумма одного заказа.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Продажи за последний месяц -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    Продажи за Последний Месяц
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ monthly_sales }} руб.</h5>
+                    <p class="card-text">Сумма продаж за последние 30 дней.</p>
+                </div>
+            </div>
+        </div>
+        <!-- Количество заказов за последний месяц -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    Количество Заказов за Последний Месяц
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ monthly_orders }}</h5>
+                    <p class="card-text">Количество завершённых заказов за последние 30 дней.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Топ 5 продаваемых товаров -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    Топ 5 Продаваемых Товаров
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        {% for product in top_products %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ product.product__name }}
+                                <span class="badge bg-primary rounded-pill">{{ product.total_quantity }}</span>
+                            </li>
+                        {% empty %}
+                            <li class="list-group-item">Нет данных.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!-- Продажи по категориям -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    Продажи по Категориям
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        {% for category in sales_by_category %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ category.product__category }}
+                                <span class="badge bg-success rounded-pill">{{ category.total_sales|floatformat:2 }} руб.</span>
+                            </li>
+                        {% empty %}
+                            <li class="list-group-item">Нет данных.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Новые клиенты за последний месяц -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    Новые Клиенты за Последний Месяц
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ new_customers }}</h5>
+                    <p class="card-text">Количество уникальных клиентов, сделавших заказы за последние 30 дней.</p>
+                </div>
+            </div>
+        </div>
+        <!-- Дополнительные метрики можно добавить здесь -->
+    </div>
+</div>
 {% endblock %}
