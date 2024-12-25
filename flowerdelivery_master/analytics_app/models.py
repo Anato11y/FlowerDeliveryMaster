@@ -8,6 +8,12 @@ class Report(models.Model):
     profit = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     expenses = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
+    @property
+    def total_amount(self):
+        return self.sales_data - self.expenses
+
     def __str__(self):
         return f"Отчёт по заказу #{self.order.id}"
+
+
 

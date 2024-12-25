@@ -45,12 +45,13 @@
             <a class="nav-link" href="{% url 'reviews:list' %}">Отзывы</a>
           </li>
 
-          <!-- Условие для отображения "Аналитики" только администраторам
-          {% if user.is_authenticated and (user.is_staff or user.is_superuser) %}
+          <!-- Условие для отображения "Аналитики" только администраторам -->
+          {% if user.is_authenticated and user.is_staff or user.is_superuser %}
+
             <li class="nav-item">
               <a class="nav-link" href="{% url 'analytics:dashboard' %}">Аналитика</a>
             </li>
-          {% endif %} -->
+          {% endif %}
         </ul>
 
         <!-- Правые ссылки: Войти, Регистрация или История заказов, Выйти -->
