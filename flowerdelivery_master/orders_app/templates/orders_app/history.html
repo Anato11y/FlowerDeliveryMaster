@@ -1,18 +1,54 @@
 {% extends 'main_app/base.html' %}
 {% block content %}
 <h2>История заказов</h2>
-{% for o in orders %}
-  <div class="card mb-2">
-    <div class="card-body">
-      <h5>Заказ #{{ o.id }} ({{ o.get_status_display }})</h5>
-      <p>Дата заказа: {{ o.created_at }}</p>
-      <p>
-        Цветы:
-        {% for flower in o.flowers.all %}
-          {{ flower.name }} ({{ flower.price }} руб.){% if not forloop.last %}, {% endif %}
-        {% endfor %}
-      </p>
-    </div>
-  </div>
-{% endfor %}
+
+{% if orders %}
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Номер заказа</th>
+        <th>Дата</th>
+        <th>Адрес доставки</th>
+        <th>Статус</th>
+        <th>Состав</th>
+        <th>Стоимость</th>
+        <th>Действие</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in orders %}
+      <tr>
+        <td>{{ item.order.pk }}</td>
+        <td>{{ item.order.created_at }}</td>
+        <td>{{ item.order.delivery_address }}</td>
+        <td>{{ item.order.get_status_display }}</td>
+        <td>
+          <ul>
+            {% for order_item in item.order.items.all %}
+              <li>{{ order_item.quantity }}x {{ order_item.flower.name }} - {{ order_item.flower.price }} руб.</li>
+            {% endfor %}
+          </ul>
+        </td>
+        <td>
+          {{ item.total_cost }} руб.
+        </td>
+        <td>
+          {% if item.order.pk %}
+            <form method="post" action="{% url 'orders:repeat_order' item.order.pk %}">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-sm btn-primary">Повторить заказ</button>
+            </form>
+          {% else %}
+            <span>Невозможно повторить заказ</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <p>У вас пока нет заказов.</p>
+{% endif %}
+
 {% endblock %}
+

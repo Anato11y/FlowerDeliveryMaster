@@ -21,4 +21,5 @@ urlpatterns = [
 
     # Существующий для корзины
     path('update/<int:flower_id>/', views.update_cart_item, name='update_cart_item'),
+    path('repeat/<int:order_id>/', views.repeat_order, name='repeat_order'),
 ]

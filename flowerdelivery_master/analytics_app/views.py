@@ -1,13 +1,11 @@
 from django.contrib.auth.decorators import user_passes_test
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.db.models import Sum, Avg, F, Count  # Добавлен Count
+from django.db.models import Sum, Avg, F, Count
 from django.utils import timezone
 from datetime import timedelta
 
-# Импорты моделей
-from .models import Report
-from orders_app.models import Order, Flower  # Импортируем Flower, так как используется ManyToManyField
+from orders_app.models import Order, OrderItem, Flower
 
 # Проверка, является ли пользователь администратором
 def is_admin(user):
@@ -28,33 +26,34 @@ def admin_required(view_func):
 def dashboard(request):
     one_month_ago = timezone.now() - timedelta(days=30)
 
-    # Общие продажи за все время
-    total_sales = Order.objects.filter(status='delivered').annotate(
-        total_amount=Sum(F('flowers__price'))
-    ).aggregate(total=Sum('total_amount'))['total'] or 0
+    # Общие продажи за всё время
+    total_sales = OrderItem.objects.aggregate(
+        total_revenue=Sum(F('flower__price') * F('quantity'))
+    )['total_revenue'] or 0
 
     # Общее количество завершённых заказов
     total_orders = Order.objects.filter(status='delivered').count()
 
     # Средняя сумма заказа
-    average_order = Order.objects.filter(status='delivered').annotate(
-        total_amount=Sum(F('flowers__price'))
-    ).aggregate(avg=Avg('total_amount'))['avg'] or 0
+    average_order = OrderItem.objects.values('order').annotate(
+        order_total=Sum(F('flower__price') * F('quantity'))
+    ).aggregate(avg=Avg('order_total'))['avg'] or 0
 
     # Продажи за последний месяц
-    monthly_sales = Order.objects.filter(status='delivered', created_at__gte=one_month_ago).annotate(
-        total_amount=Sum(F('flowers__price'))
-    ).aggregate(total=Sum('total_amount'))['total'] or 0
+    monthly_sales = OrderItem.objects.filter(order__created_at__gte=one_month_ago).aggregate(
+        total_revenue=Sum(F('flower__price') * F('quantity'))
+    )['total_revenue'] or 0
+
     monthly_orders = Order.objects.filter(status='delivered', created_at__gte=one_month_ago).count()
 
     # Топ 5 продаваемых товаров
-    top_products = Order.objects.filter(status='delivered').values('flowers__name').annotate(
-        total_quantity=Count('flowers')
+    top_products = OrderItem.objects.values('flower__name').annotate(
+        total_quantity=Sum('quantity')
     ).order_by('-total_quantity')[:5]
 
     # Продажи по категориям (если есть категории у цветов)
-    sales_by_category = Flower.objects.values('name').annotate(
-        total_sales=Sum('price')
+    sales_by_category = OrderItem.objects.values('flower__name').annotate(
+        total_sales=Sum(F('flower__price') * F('quantity'))
     ).order_by('-total_sales')
 
     # Новые клиенты за последний месяц
@@ -73,3 +72,4 @@ def dashboard(request):
     }
 
     return render(request, 'analytics_app/dashboard.html', context)
+
