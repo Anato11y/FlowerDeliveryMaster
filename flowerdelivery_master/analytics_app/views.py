@@ -1,13 +1,13 @@
 from django.contrib.auth.decorators import user_passes_test
 from django.shortcuts import render, redirect
-from django.contrib import messages
-from django.db.models import Sum, Avg, F, Count  # Добавлен Count
-from django.utils import timezone
+from django.db.models import Sum, Count, Avg, F
 from datetime import timedelta
+from django.utils import timezone
+from django.contrib import messages
 
 # Импорты моделей
-from .models import Report
-from orders_app.models import Order, Flower  # Импортируем Flower, так как используется ManyToManyField
+from orders_app.models import Order, OrderItem, Flower  # Убедитесь, что Flower определен
+from .models import Report  # Если Report используется
 
 # Проверка, является ли пользователь администратором
 def is_admin(user):
@@ -30,7 +30,7 @@ def dashboard(request):
 
     # Общие продажи за все время
     total_sales = Order.objects.filter(status='delivered').annotate(
-        total_amount=Sum(F('flowers__price'))
+        total_amount=Sum(F('flowers__price'))  # Подсчет общей суммы заказа
     ).aggregate(total=Sum('total_amount'))['total'] or 0
 
     # Общее количество завершённых заказов
@@ -48,12 +48,14 @@ def dashboard(request):
     monthly_orders = Order.objects.filter(status='delivered', created_at__gte=one_month_ago).count()
 
     # Топ 5 продаваемых товаров
-    top_products = Order.objects.filter(status='delivered').values('flowers__name').annotate(
-        total_quantity=Count('flowers')
+    top_products = OrderItem.objects.filter(order__status='delivered').values(
+        'product__name'  # Используем правильное имя поля
+    ).annotate(
+        total_quantity=Sum('quantity')  # Считаем общее количество
     ).order_by('-total_quantity')[:5]
 
     # Продажи по категориям (если есть категории у цветов)
-    sales_by_category = Flower.objects.values('name').annotate(
+    sales_by_category = Flower.objects.values('category__name').annotate(
         total_sales=Sum('price')
     ).order_by('-total_sales')
 

@@ -1,32 +1,189 @@
+/* Общий стиль для сайта */
 body {
-    background-color: #f2f2f2;
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: 'Roboto', sans-serif;
+    background-color: #f8f9fa; /* Светлый фон */
+    color: #333; /* Основной цвет текста */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Минимальная высота: весь экран */
+    margin: 0; /* Уберите отступы */
 }
 
-.navbar-brand {
-    font-weight: bold;
-    font-size: 1.5rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+/* Шапка */
+header {
+    position: sticky; /* Шапка фиксируется при прокрутке */
+    top: 0; /* Фиксация сверху */
+    z-index: 1000; /* Высокий z-index, чтобы шапка была выше других элементов */
+    background: linear-gradient(45deg, #265f2b, #92c087); /* Фон шапки */
+    color: white;
+    padding: 10px 20px;
 }
 
-.jumbotron {
-    background: linear-gradient(135deg, #ffd6e7 0%, #ffa6c9 100%);
-    color: #333;
-    border-radius: 10px;
+header h1, footer p {
+    margin: 0;
+    font-size: 1rem;
 }
-.card-img-top {
-  height: 200px; /* зафиксированная высота (укажите нужное значение) */
-  object-fit: cover; /* обрезает картинку по высоте, сохраняя пропорции */
-  width: 100%; /* по ширине карточки */
+
+header nav a, footer a {
+    text-decoration: none;
+    color: white;
+    font-weight: 500;
+    transition: color 0.3s;
 }
+
+header nav a:hover, footer a:hover {
+    color: #ffcc00;
+}
+
+
+nav a {
+    color: white;
+    text-decoration: none;
+    margin-right: 15px;
+}
+
+nav a:hover {
+    text-decoration: underline;
+}
+
+/* Карточки каталога */
 .card {
-  height: 450px;
-  /* или другой зафиксированный размер */
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Тень */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.bg-dark {
-    --bs-bg-opacity: 1;
-        background-color: rgb(0 89 31) !important;
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.2);
 }
 
+/* Кнопки */
+.btn-custom {
+    background-color: #2575fc;
+    color: white;
+    border-radius: 20px;
+    padding: 10px 20px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-custom:hover {
+    background-color: #1a61d0;
+}
+
+/* Модальное окно */
+.modal-header {
+    background-color: #6a11cb;
+    color: white;
+}
+
+.modal-footer .btn {
+    border-radius: 20px;
+}
+
+
+footer p {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+footer {
+    position: sticky; /* Фиксация футера при прокрутке */
+    bottom: 0; /* Фиксация снизу */
+    width: 100%; /* Футер растягивается на всю ширину */
+    background: linear-gradient(45deg, #265f2b, #92c087); /* Фон футера */
+    color: white;
+    text-align: center;
+    padding: 10px;
+    z-index: 1000; /* Высокий z-index для видимости поверх других элементов */
+}
+
+/* Стиль кнопки "Перейти в каталог" */
+.btn-custom {
+    background-color: #265f2b; /* Зелёный фон */
+    color: white;
+    border-radius: 20px;
+    padding: 10px 20px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-custom:hover {
+    background-color: #1a4d1f; /* Более тёмный зелёный */
+}
+
+/* Кнопка в карточке */
+.btn-card {
+    background-color: #92c087; /* Светло-зелёный фон */
+    color: white;
+    border-radius: 10px;
+    padding: 5px 10px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-card:hover {
+    background-color: #6a9d6e; /* Более насыщенный зелёный */
+}
+
+/* Карточка */
+.card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    height: 500px; /* Устанавливаем фиксированную высоту для всех карточек */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.card img {
+    border-radius: 10px 10px 0 0;
+    object-fit: cover;
+    max-height: 450px;
+    max-width: 80%;
+}
+
+.card-body .mt-auto {
+    margin-top: auto; /* Автоматически сдвигает блок кнопки вниз */
+    text-align: center; /* Центрирует кнопку по горизонтали */
+}
+
+.btn-card {
+    background-color: #92c087;
+    color: white;
+    border-radius: 10px;
+    padding: 5px 10px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-card:hover {
+    background-color: #6a9d6e;
+}
+
+#carousel-row {
+    display: flex; /* Горизонтальное выравнивание карточек */
+    flex-wrap: nowrap; /* Запрещаем перенос на новую строку */
+    transition: transform 0.5s ease-in-out; /* Анимация для плавного сдвига */
+    will-change: transform;
+}
+
+#carousel-row > * {
+    flex: 0 0 20%; /* Каждая карточка занимает 20% ширины */
+    max-width: 20%;
+}
+
+.carousel-inner {
+    overflow: hidden; /* Скрываем карточки за пределами видимой области */
+}
+.btn-custom {
+    background-color: #92c087;
+    color: white;
+    border-radius: 5px;
+    padding: 10px 20px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-custom:hover {
+    background-color: #6a9d6e;
+}

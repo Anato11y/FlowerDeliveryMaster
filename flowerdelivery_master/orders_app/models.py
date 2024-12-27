@@ -16,10 +16,18 @@ class Order(models.Model):
         ('in_progress', 'В процессе'),
         ('delivered', 'Доставлено'),
     )
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    flowers = models.ManyToManyField(Flower)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
-    created_at = models.DateTimeField(auto_now_add=True)
-
+    user = models.ForeignKey(User, on_delete=models.CASCADE)  # Связь с пользователем
+    customer_name = models.CharField(max_length=255)  # Добавляем поле имени клиента
+    flowers = models.ManyToManyField('Flower', through='OrderItem')  # Продукты в заказе
+    created_at = models.DateTimeField(auto_now_add=True)  # Дата создания заказа
+    status = models.CharField(max_length=50, default='new')  # Статус заказа
     def __str__(self):
         return f"Заказ #{self.pk} от {self.user.username}"
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)  # Связь с заказом
+    flower = models.ForeignKey(Flower, on_delete=models.CASCADE)  # Связь с цветком
+    quantity = models.PositiveIntegerField()  # Количество
+
+    def __str__(self):
+        return f"{self.quantity} x {self.flower.name} (Order #{self.order.id})"

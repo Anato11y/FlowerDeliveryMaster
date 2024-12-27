@@ -4,6 +4,7 @@ from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 from .models import Flower, Order
 from django.contrib import messages
+from django.db.models import Count, Sum
 def catalog(request):
     """
     Каталог.
@@ -198,3 +199,16 @@ def register(request):
         form = UserCreationForm()
 
     return render(request, 'registration/register.html', {'form': form})
+
+
+def order_analytics(request):
+    # Получаем количество заказов по статусам
+    orders_by_status = Order.objects.values('status').annotate(count=Count('id'))
+
+    # Получаем сумму по заказам (например, для подсчета дохода)
+    total_income = Order.objects.aggregate(total=Sum('total_amount'))  # Предположим, что у нас есть поле total_amount
+
+    return render(request, 'orders/analytics.html', {
+        'orders_by_status': orders_by_status,
+        'total_income': total_income,
+    })
