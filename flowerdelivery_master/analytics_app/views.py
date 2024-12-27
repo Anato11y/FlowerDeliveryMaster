@@ -1,66 +1,72 @@
-from django.contrib.auth.decorators import user_passes_test
-from django.shortcuts import render, redirect
+from asgiref.sync import sync_to_async
+from django.shortcuts import render
 from django.db.models import Sum, Count, Avg, F
 from datetime import timedelta
 from django.utils import timezone
-from django.contrib import messages
+from django.core.exceptions import FieldError
 
-# Импорты моделей
-from orders_app.models import Order, OrderItem, Flower  # Убедитесь, что Flower определен
-from .models import Report  # Если Report используется
+from orders_app.models import Order, OrderItem, Flower
 
-# Проверка, является ли пользователь администратором
-def is_admin(user):
-    return user.is_superuser or user.is_staff
-
-# Декоратор для ограничения доступа
-def admin_required(view_func):
-    def _wrapped_view(request, *args, **kwargs):
-        if is_admin(request.user):
-            return view_func(request, *args, **kwargs)
-        else:
-            messages.error(request, "Доступ к этой странице запрещён.")
-            return redirect('login')  # Используйте имя вашего URL для входа
-    return _wrapped_view
-
-# Панель администратора с аналитикой
-@admin_required
-def dashboard(request):
+# Асинхронная панель администратора с аналитикой
+async def dashboard(request):
+    # Определяем временной интервал
     one_month_ago = timezone.now() - timedelta(days=30)
 
     # Общие продажи за все время
-    total_sales = Order.objects.filter(status='delivered').annotate(
-        total_amount=Sum(F('flowers__price'))  # Подсчет общей суммы заказа
-    ).aggregate(total=Sum('total_amount'))['total'] or 0
+    total_sales_result = await sync_to_async(
+        lambda: OrderItem.objects.filter(order__status='delivered').aggregate(
+            total=Sum(F('quantity') * F('flower__price'))
+        )
+    )()
+    total_sales = total_sales_result['total'] or 0
 
     # Общее количество завершённых заказов
-    total_orders = Order.objects.filter(status='delivered').count()
+    total_orders = await sync_to_async(
+        lambda: Order.objects.filter(status='delivered').count()
+    )()
 
     # Средняя сумма заказа
-    average_order = Order.objects.filter(status='delivered').annotate(
-        total_amount=Sum(F('flowers__price'))
-    ).aggregate(avg=Avg('total_amount'))['avg'] or 0
+    average_order_result = await sync_to_async(
+        lambda: OrderItem.objects.filter(order__status='delivered').values('order').annotate(
+            order_total=Sum(F('quantity') * F('flower__price'))
+        ).aggregate(avg=Avg('order_total'))
+    )()
+    average_order = average_order_result['avg'] or 0
 
     # Продажи за последний месяц
-    monthly_sales = Order.objects.filter(status='delivered', created_at__gte=one_month_ago).annotate(
-        total_amount=Sum(F('flowers__price'))
-    ).aggregate(total=Sum('total_amount'))['total'] or 0
-    monthly_orders = Order.objects.filter(status='delivered', created_at__gte=one_month_ago).count()
+    monthly_sales_result = await sync_to_async(
+        lambda: OrderItem.objects.filter(order__status='delivered', order__created_at__gte=one_month_ago).aggregate(
+            total=Sum(F('quantity') * F('flower__price'))
+        )
+    )()
+    monthly_sales = monthly_sales_result['total'] or 0
+    monthly_orders = await sync_to_async(
+        lambda: Order.objects.filter(status='delivered', created_at__gte=one_month_ago).count()
+    )()
 
     # Топ 5 продаваемых товаров
-    top_products = OrderItem.objects.filter(order__status='delivered').values(
-        'product__name'  # Используем правильное имя поля
-    ).annotate(
-        total_quantity=Sum('quantity')  # Считаем общее количество
-    ).order_by('-total_quantity')[:5]
+    top_products = await sync_to_async(
+        lambda: list(OrderItem.objects.filter(order__status='delivered').values(
+            'flower__name'
+        ).annotate(
+            total_quantity=Sum('quantity')
+        ).order_by('-total_quantity')[:5])
+    )()
 
-    # Продажи по категориям (если есть категории у цветов)
-    sales_by_category = Flower.objects.values('category__name').annotate(
-        total_sales=Sum('price')
-    ).order_by('-total_sales')
+    # Продажи по категориям (если есть категории)
+    try:
+        sales_by_category = await sync_to_async(
+            lambda: list(Flower.objects.values('category__name').annotate(
+                total_sales=Sum(F('orderitem__quantity') * F('price'))
+            ).order_by('-total_sales'))
+        )()
+    except FieldError:
+        sales_by_category = []  # Если категорий нет, возвращаем пустой список
 
     # Новые клиенты за последний месяц
-    new_customers = Order.objects.filter(status='delivered', created_at__gte=one_month_ago).values('user').distinct().count()
+    new_customers = await sync_to_async(
+        lambda: Order.objects.filter(status='delivered', created_at__gte=one_month_ago).values('user').distinct().count()
+    )()
 
     # Подготовка данных для шаблона
     context = {
@@ -74,4 +80,5 @@ def dashboard(request):
         'new_customers': new_customers,
     }
 
-    return render(request, 'analytics_app/dashboard.html', context)
+    # Рендеринг шаблона
+    return await sync_to_async(render)(request, 'analytics_app/dashboard.html', context)
