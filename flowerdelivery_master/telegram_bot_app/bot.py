@@ -2,6 +2,7 @@ from telegram import Bot, Update
 from telegram.ext import Application, CommandHandler, ContextTypes
 from asgiref.sync import sync_to_async
 from flowerdelivery_master.orders_app.models import Order, OrderItem
+from orders_app.models import Order, OrderItem
 
 TOKEN = "7851649387:AAE0ovMqW7U3WFL6pCetd3aQLMwoJptuKwo"
 CHAT_ID = "551378516"  # Укажите ваш Telegram chat_id

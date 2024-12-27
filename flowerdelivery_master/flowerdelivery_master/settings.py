@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'orders_app',
     'reviews_app',
     'analytics_app',
-    'telegram_bot_app',
+ #   'telegram_bot_app',
 ]
 
 MIDDLEWARE = [
