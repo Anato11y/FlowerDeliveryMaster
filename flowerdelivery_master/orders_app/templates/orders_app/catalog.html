@@ -43,8 +43,7 @@
   </form>
 
   <!-- Показываем текущее количество в корзине -->
-  <span class="mx-2">В корзине: {{ item.qty }}</span>
-
+  <span class="mx-2">В корзине: {{ item.qty|default:0 }}</span>
   <!-- Кнопка "плюс" -->
   <form method="post"
         action="{% url 'orders:update_catalog_item_in_catalog' item.flower.id %}"
