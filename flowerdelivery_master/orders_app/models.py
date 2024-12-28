@@ -22,14 +22,16 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='pending')
     bouquet_name = models.CharField(max_length=255, blank=True, null=True)
-    delivery_address = models.TextField(blank=True, null=True)  # Адрес доставки
+    delivery_address = models.TextField(blank=True, null=True)
+
     def __str__(self):
         return f"Заказ #{self.pk} от {self.user.username}"
 
 class OrderItem(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE)  # Связь с заказом
-    flower = models.ForeignKey(Flower, on_delete=models.CASCADE)  # Связь с цветком
-    quantity = models.PositiveIntegerField()  # Количество цветов
+    # Добавили related_name='items' для связи с Order
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
+    flower = models.ForeignKey(Flower, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField()
 
     def __str__(self):
         return f"{self.quantity} x {self.flower.name} (Order #{self.order.pk})"
