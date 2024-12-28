@@ -1,9 +1,0 @@
-import os
-from flowerdelivery_master.telegram_bot_app.bot import bot
-
-if __name__ == "__main__":
-    # Убедитесь, что в переменной окружения установлен токен
-    os.environ["API_TOKEN"] = "7851649387:AAE0ovMqW7U3WFL6pCetd3aQLMwoJptuKwo"
-
-    # Запускаем бота
-    bot.run_polling()

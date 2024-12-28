@@ -18,17 +18,15 @@
       <tr>
         <td>{{ item.flower.name }}</td>
         <td>{{ item.flower.price }} руб.</td>
-        <td>
-          <!-- Вывод количества -->
-          {{ item.qty }}
-        </td>
+        <td>{{ item.qty }}</td>
         <td>{{ item.cost }} руб.</td>
         <td>
-          <!-- Кнопки + и - для изменения количества -->
+          <!-- Кнопка "минус" -->
           <form method="post" action="{% url 'orders:update_cart_item' item.flower.id %}" style="display: inline-block;">
             {% csrf_token %}
             <button name="action" value="minus" type="submit" class="btn btn-sm btn-outline-secondary">-</button>
           </form>
+          <!-- Кнопка "плюс" -->
           <form method="post" action="{% url 'orders:update_cart_item' item.flower.id %}" style="display: inline-block;">
             {% csrf_token %}
             <button name="action" value="plus" type="submit" class="btn btn-sm btn-outline-secondary">+</button>
@@ -38,14 +36,27 @@
       {% endfor %}
     </tbody>
   </table>
+
   <p><strong>Итого:</strong> {{ total_sum }} руб.</p>
+
+  <!-- Форма оформления заказа -->
   <form method="post" action="{% url 'orders:checkout' %}">
     {% csrf_token %}
-    <button class="btn btn-primary">Оформить заказ</button>
+    <!-- Поле для ввода адреса доставки (обязательное) -->
+    <div class="mb-3">
+      <label for="delivery_address" class="form-label">Адрес доставки</label>
+      <textarea name="delivery_address"
+                id="delivery_address"
+                rows="2"
+                class="form-control"
+                required></textarea>
+    </div>
+    <button class="btn btn-primary mt-2">Оформить заказ</button>
   </form>
 {% else %}
   <p>Корзина пуста</p>
 {% endif %}
 
 {% endblock %}
+
 

@@ -14,7 +14,7 @@ def send_order_created_notification(sender, instance, created, **kwargs):
             'bouquet_name': ", ".join([flower.name for flower in instance.flowers.all()]),
             'delivery_address': instance.delivery_address
         }
-        async_to_sync(notify_new_order)(order_info)
+        notify_new_order(instance.pk) # <-- передаём число
 
 @receiver(pre_save, sender=Order)
 def send_order_status_update(sender, instance, **kwargs):

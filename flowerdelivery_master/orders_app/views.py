@@ -120,7 +120,7 @@ async def checkout(request):
         # Очистка корзины (сессии)
         await sync_to_async(lambda: request.session.update({'cart': {}}))()
 
-        # Отправка сообщения об успешном заказе (messages — синхронный)
+        # Сообщение об успехе (messages — синхронный)
         await sync_to_async(messages.success)(
             request,
             f"Ваш заказ №{order.pk} успешно оформлен!"
