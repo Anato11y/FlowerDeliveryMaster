@@ -1,18 +1,39 @@
 {% extends 'main_app/base.html' %}
 {% block content %}
 <h2>История заказов</h2>
-{% for o in orders %}
-  <div class="card mb-2">
-    <div class="card-body">
-      <h5>Заказ #{{ o.id }} ({{ o.get_status_display }})</h5>
-      <p>Дата заказа: {{ o.created_at }}</p>
-      <p>
-        Цветы:
-        {% for flower in o.flowers.all %}
-          {{ flower.name }} ({{ flower.price }} руб.){% if not forloop.last %}, {% endif %}
-        {% endfor %}
-      </p>
+
+{% if order_data %}
+  {% for entry in order_data %}
+    <div class="card mb-3">
+      <div class="card-header">
+        Заказ #{{ entry.order.id }} ({{ entry.order.get_status_display }})
+      </div>
+      <div class="card-body">
+        <p><strong>Дата заказа:</strong> {{ entry.order.created_at|date:"d M Y, H:i" }}</p>
+        <p><strong>Адрес доставки:</strong> {{ entry.order.delivery_address }}</p>
+        <ul>
+          {% for item in entry.items %}
+          <li>
+            <div class="d-flex align-items-center">
+              <img
+                  src="{{ item.flower.image.url|default:'/static/img/default_image.png' }}"
+                  alt="{{ item.flower.name }}"
+                  style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px; border-radius: 5px;">
+              {{ item.flower.name }} x {{ item.qty }} шт. = {{ item.cost }} руб.
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+        <p><strong>Итого:</strong> {{ entry.total_sum }} руб.</p>
+        <form method="post" action="{% url 'orders:repeat_order' entry.order.id %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-primary btn-sm">Повторить заказ</button>
+        </form>
+      </div>
     </div>
-  </div>
-{% endfor %}
+  {% endfor %}
+{% else %}
+  <p>У вас ещё нет заказов.</p>
+{% endif %}
+
 {% endblock %}

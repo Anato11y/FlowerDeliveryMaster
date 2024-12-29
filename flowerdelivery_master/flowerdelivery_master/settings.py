@@ -61,7 +61,7 @@ ROOT_URLCONF = 'flowerdelivery_master.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'orders_app' / 'templates'],
+        'DIRS': [],
         'APP_DIRS': True,
 
         'OPTIONS': {

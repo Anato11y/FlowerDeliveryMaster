@@ -143,11 +143,25 @@ async def checkout(request):
 
 @login_required
 def order_history(request):
-    """История заказов."""
-    orders = Order.objects.filter(user=request.user).prefetch_related('items__flower').annotate(
-        total_cost=Sum(F('items__quantity') * F('items__flower__price'))
-    )
-    return render(request, 'orders_app/history.html', {'orders': orders})
+    """Отображение истории заказов текущего пользователя."""
+    orders = Order.objects.filter(user=request.user).order_by('-created_at')
+    order_data = []
+    for order in orders:
+        items = OrderItem.objects.filter(order=order).select_related('flower')
+        total_sum = sum(item.quantity * item.flower.price for item in items)
+        order_data.append({
+            'order': order,
+            'items': [
+                {
+                    'flower': item.flower,
+                    'qty': item.quantity,
+                    'cost': item.quantity * item.flower.price,
+                }
+                for item in items
+            ],
+            'total_sum': total_sum,
+        })
+    return render(request, 'orders_app/history.html', {'order_data': order_data})
 
 
 @login_required
@@ -189,3 +203,15 @@ def delete_cart_item(request, flower_id):
             del cart[str(flower_id)]  # Удаляем товар из корзины
             request.session['cart'] = cart  # Обновляем сессию
     return redirect('orders:cart')  # Перенаправляем на страницу корзины
+
+def repeat_order(request, order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    cart = request.session.get('cart', {})
+
+    # Добавляем товары из заказа в корзину
+    for item in order.items.all():
+        cart[str(item.flower.id)] = cart.get(str(item.flower.id), 0) + item.quantity
+
+    request.session['cart'] = cart
+    messages.success(request, f"Товары из заказа #{order_id} добавлены в корзину.")
+    return redirect('orders:cart')

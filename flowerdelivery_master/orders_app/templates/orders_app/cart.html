@@ -23,7 +23,6 @@
                 src="{{ item.flower.image.url|default:'/static/img/default_image.png' }}"
                 alt="{{ item.flower.name }}"
                 style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px; border-radius: 5px;">
-
             {{ item.flower.name }}
           </div>
         </td>
@@ -46,7 +45,6 @@
             {% csrf_token %}
             <button type="submit" class="btn btn-sm btn-outline-danger">Удалить</button>
           </form>
-
         </td>
       </tr>
       {% endfor %}

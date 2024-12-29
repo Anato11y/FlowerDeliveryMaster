@@ -15,8 +15,10 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/register/', views.register, name='register'),
 
-    # Повтор заказа
+
     path('repeat/<int:order_id>/', views.repeat_order, name='repeat_order'),
     path('update_cart_item/<int:flower_id>/', views.update_cart_item, name='update_cart_item'),
     path('delete_cart_item/<int:flower_id>/', views.delete_cart_item, name='delete_cart_item'),
+    path('repeat_order/<int:order_id>/', views.repeat_order, name='repeat_order'),
+
 ]
