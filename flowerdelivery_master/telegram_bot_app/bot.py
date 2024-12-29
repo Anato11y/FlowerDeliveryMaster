@@ -1,30 +1,19 @@
-import logging
-from telegram import Bot
-from telegram.error import TelegramError
+import requests
 from orders_app.models import Order, OrderItem
-from asgiref.sync import async_to_sync
-from telegram.request import HTTPXRequest
 
 API_TOKEN = '7851649387:AAE0ovMqW7U3WFL6pCetd3aQLMwoJptuKwo'
-# Увеличиваем пул соединений
-request = HTTPXRequest(read_timeout=10)
-bot = Bot(token=API_TOKEN, request=request)
+CHAT_ID = '551378516'
+TELEGRAM_API_URL = f"https://api.telegram.org/bot{API_TOKEN}/sendMessage"
 
 def notify_new_order(order_id: int):
     """
-    Уведомление о новом заказе.
+    Уведомление о новом заказе через синхронный Telegram API.
     """
-    chat_id = '551378516'  # Замените на ваш реальный chat_id
     try:
         # Загружаем заказ из базы данных
         order = Order.objects.select_related('user').get(pk=order_id)
 
-        # Проверяем, есть ли заказ
-        if not order:
-            logging.error(f"Заказ с ID {order_id} не найден.")
-            return
-
-        # Получаем список товаров в заказе
+        # Формируем список товаров
         order_items = OrderItem.objects.filter(order=order).select_related('flower')
         items_details = "\n".join(
             [f"{item.flower.name} x {item.quantity} шт. - {item.flower.price} руб./шт."
@@ -41,22 +30,39 @@ def notify_new_order(order_id: int):
             f"Статус: {order.get_status_display()}"
         )
 
-        # Отправляем сообщение в Telegram
-        async_to_sync(bot.send_message)(chat_id=chat_id, text=message)
+        # Проверка: если сообщение пустое, не отправляем
+        if not items_details.strip():
+            return  # Прекращаем выполнение, если состав заказа пуст
+
+        # Отправляем сообщение через Telegram API
+        response = requests.post(
+            TELEGRAM_API_URL,
+            data={'chat_id': CHAT_ID, 'text': message},
+            timeout=10
+        )
+
+        if response.status_code != 200:
+            print(f"Ошибка при отправке сообщения: {response.text}")
 
     except Order.DoesNotExist:
-        logging.error(f"Заказ с ID {order_id} не найден.")
-    except TelegramError as e:
-        logging.error(f"Ошибка при отправке сообщения: {e}")
-
+        print(f"Заказ с ID {order_id} не найден.")
+    except requests.RequestException as e:
+        print(f"Ошибка при отправке сообщения через Telegram: {e}")
 
 def notify_order_status(order_id: int, status: str):
     """
-    Уведомление об изменении статуса заказа.
+    Уведомление об изменении статуса заказа через синхронный Telegram API.
     """
-    chat_id = '551378516'
     message = f"Статус заказа #{order_id} изменён на: {status}"
     try:
-        async_to_sync(bot.send_message)(chat_id=chat_id, text=message)
-    except TelegramError as e:
-        logging.error(f"Ошибка при отправке сообщения: {e}")
+        response = requests.post(
+            TELEGRAM_API_URL,
+            data={'chat_id': CHAT_ID, 'text': message},
+            timeout=10
+        )
+
+        if response.status_code != 200:
+            raise ValueError(f"Ошибка при отправке сообщения: {response.text}")
+
+    except requests.RequestException:
+        pass

@@ -139,3 +139,4 @@ LOGIN_REDIRECT_URL = 'orders:catalog'  # URL, на который перенап
 LOGOUT_REDIRECT_URL = 'orders:catalog'
 
 ASGI_APPLICATION = 'flowerdelivery_master.asgi.application'
+
