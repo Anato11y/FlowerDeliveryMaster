@@ -16,7 +16,17 @@
     <tbody>
       {% for item in items %}
       <tr>
-        <td>{{ item.flower.name }}</td>
+        <!-- Колонка с изображением и названием -->
+        <td>
+          <div class="d-flex align-items-center">
+            <img
+                src="{{ item.flower.image.url|default:'/static/img/default_image.png' }}"
+                alt="{{ item.flower.name }}"
+                style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px; border-radius: 5px;">
+
+            {{ item.flower.name }}
+          </div>
+        </td>
         <td>{{ item.flower.price }} руб.</td>
         <td>{{ item.qty }}</td>
         <td>{{ item.cost }} руб.</td>
@@ -31,6 +41,12 @@
             {% csrf_token %}
             <button name="action" value="plus" type="submit" class="btn btn-sm btn-outline-secondary">+</button>
           </form>
+          <!-- Кнопка "удалить" -->
+          <form method="post" action="{% url 'orders:delete_cart_item' item.flower.id %}" style="display: inline-block;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm btn-outline-danger">Удалить</button>
+          </form>
+
         </td>
       </tr>
       {% endfor %}
@@ -51,12 +67,10 @@
                 class="form-control"
                 required></textarea>
     </div>
-    <button class="btn btn-primary mt-2">Оформить заказ</button>
+    <button class="btn btn-custom mt-2">Оформить заказ</button>
   </form>
 {% else %}
   <p>Корзина пуста</p>
 {% endif %}
 
 {% endblock %}
-
-

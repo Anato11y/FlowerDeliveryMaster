@@ -78,16 +78,24 @@ async def update_cart_item(request, flower_id):
     """Изменение количества товара в корзине."""
     if request.method == 'POST':
         cart = request.session.get('cart', {})
+
+        # Проверяем, есть ли товар в корзине
         if str(flower_id) not in cart:
             return redirect('orders:cart')
 
         action = request.POST.get('action')
+
+        # Обрабатываем действия
         if action == 'plus':
             cart[str(flower_id)] += 1
         elif action == 'minus':
             cart[str(flower_id)] -= 1
             if cart[str(flower_id)] <= 0:
                 del cart[str(flower_id)]
+        elif action == 'delete':
+            del cart[str(flower_id)]  # Удаление товара из корзины
+
+        # Сохраняем обновлённую корзину в сессии
         request.session['cart'] = cart
 
     return redirect('orders:cart')
@@ -173,3 +181,11 @@ def register(request):
         form = UserCreationForm()
 
     return render(request, 'registration/register.html', {'form': form})
+def delete_cart_item(request, flower_id):
+    """Удаление товара из корзины."""
+    if request.method == 'POST':
+        cart = request.session.get('cart', {})
+        if str(flower_id) in cart:
+            del cart[str(flower_id)]  # Удаляем товар из корзины
+            request.session['cart'] = cart  # Обновляем сессию
+    return redirect('orders:cart')  # Перенаправляем на страницу корзины

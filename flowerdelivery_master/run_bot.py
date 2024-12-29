@@ -79,9 +79,39 @@ async def analytics(update, context):
     await update.message.reply_text(message)
 # Функция обработчика для команды /pending_orders
 async def pending_orders(update, context):
-    # Реализация для невыполненных заказов
-    await update.message.reply_text("Здесь будет информация о невыполненных заказах.")
+    # Функция для получения невыполненных заказов
+    @sync_to_async
+    def get_pending_orders():
+        return list(
+            Order.objects.exclude(status='delivered')
+            .select_related('user')
+        )
 
+    # Проверяем, есть ли невыполненные заказы
+    @sync_to_async
+    def has_pending_orders():
+        return Order.objects.exclude(status='delivered').exists()
+
+    # Проверяем наличие невыполненных заказов
+    pending_exist = await has_pending_orders()
+    if not pending_exist:
+        await update.message.reply_text("Нет невыполненных заказов.")
+        return
+
+    # Получаем список невыполненных заказов
+    pending = await get_pending_orders()
+
+    # Формируем сообщение
+    message = "Невыполненные заказы:\n"
+    for order in pending:
+        message += (
+            f"Заказ #{order.id}\n"
+            f"Клиент: {order.user.username if order.user else 'Гость'}\n"
+            f"Адрес доставки: {order.delivery_address}\n"
+            f"Статус: {order.get_status_display()}\n\n"
+        )
+
+    await update.message.reply_text(message)
 def main():
     # Создаём объект Application с вашим токеном
     application = Application.builder().token("7851649387:AAE0ovMqW7U3WFL6pCetd3aQLMwoJptuKwo").build()
