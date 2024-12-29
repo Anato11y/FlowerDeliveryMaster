@@ -3,6 +3,26 @@
 {% block content %}
 <div class="container mt-5">
     <h2>Аналитика</h2>
+    <div class="container mt-5">
+
+<div class="row justify-content-center">
+    <!-- Общие данные -->
+    <div class="col-md-8"> <!-- Изменяем col-md-4 на col-md-8 для увеличения ширины карточки -->
+        <div class="card mb-4" style="width: 100%; padding: 20px; box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);">
+            <div class="card-header text-center">Круговая диаграмма</div>
+            <div class="card-body text-center">
+                {% if chart %}
+                    <img src="data:image/png;base64,{{ chart }}" alt="Статусы заказов за сегодня" class="img-fluid" style="max-width: 500px; height: auto;">
+                {% else %}
+                    <p>Нет данных для отображения диаграммы.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
     <div class="row">
         <!-- Общие продажи -->
         <div class="col-md-4">

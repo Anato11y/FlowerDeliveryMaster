@@ -4,6 +4,13 @@ from django.db.models import Sum, Count, Avg, F
 from datetime import timedelta
 from django.utils import timezone
 from django.core.exceptions import FieldError
+import matplotlib.pyplot as plt
+from io import BytesIO
+import base64
+from datetime import datetime
+from django.db.models import Count
+from orders_app.models import Order
+
 
 from orders_app.models import Order, OrderItem, Flower
 
@@ -82,3 +89,45 @@ async def dashboard(request):
 
     # Рендеринг шаблона
     return await sync_to_async(render)(request, 'analytics_app/dashboard.html', context)
+
+
+def dashboard(request):
+    # Общие метрики
+    today = datetime.now().date()
+    orders_today = Order.objects.filter(created_at__date=today)
+
+    # Статистика по статусам
+    status_counts = orders_today.values('status').annotate(count=Count('id'))
+
+    # Построение круговой диаграммы
+    labels = [status['status'] for status in status_counts]
+    sizes = [status['count'] for status in status_counts]
+
+    if sizes:
+        fig, ax = plt.subplots()
+        ax.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90)
+        ax.axis('equal')
+        plt.title('Статусы заказов за сегодня')
+
+        # Преобразование диаграммы в base64
+        buffer = BytesIO()
+        plt.savefig(buffer, format='png')
+        buffer.seek(0)
+        chart_base64 = base64.b64encode(buffer.read()).decode('utf-8')
+        buffer.close()
+    else:
+        chart_base64 = None
+
+    # Передача данных в шаблон
+    context = {
+        'total_sales': 100000,  # Примерная метрика
+        'total_orders': 50,  # Примерная метрика
+        'average_order': 2000,  # Примерная метрика
+        'monthly_sales': 30000,  # Примерная метрика
+        'monthly_orders': 20,  # Примерная метрика
+        'top_products': [],  # Примерная метрика
+        'sales_by_category': [],  # Примерная метрика
+        'new_customers': 5,  # Примерная метрика
+        'chart': chart_base64,  # Добавляем диаграмму
+    }
+    return render(request, 'analytics_app/dashboard.html', context)

@@ -27,7 +27,7 @@
         <p><strong>Итого:</strong> {{ entry.total_sum }} руб.</p>
         <form method="post" action="{% url 'orders:repeat_order' entry.order.id %}">
           {% csrf_token %}
-          <button type="submit" class="btn btn-primary btn-sm">Повторить заказ</button>
+          <button type="submit" class="btn btn-order"">Повторить заказ</button>
         </form>
       </div>
     </div>
