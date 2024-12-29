@@ -5,61 +5,62 @@
 
 <div class="row row-cols-1 row-cols-md-3 g-4">
   {% for item in flowers %}
-    <!--
-      item.flower → объект Flower
-      item.qty    → число штук, уже лежащих в корзине
-    -->
     <div class="col">
       <div class="card h-100 d-flex flex-column">
         {% if item.flower.image %}
-          <img
-            src="{{ item.flower.image.url }}"
-            class="card-img-top"
-            alt="{{ item.flower.name }}"
-          >
+          <div class="image-wrapper">
+            <img
+              src="{{ item.flower.image.url }}"
+              class="card-img-top zoom-on-hover"
+              alt="{{ item.flower.name }}"
+            >
+          </div>
         {% else %}
-          <img
-            src="{% static 'img/default_image.png' %}"
-            class="card-img-top"
-            alt="Нет изображения"
-          >
+          <div class="image-wrapper">
+            <img
+              src="{% static 'img/default_image.png' %}"
+              class="card-img-top zoom-on-hover"
+              alt="Нет изображения"
+            >
+          </div>
         {% endif %}
         <div class="card-body d-flex flex-column">
           <h5 class="card-title">{{ item.flower.name }}</h5>
           <p class="card-text">{{ item.flower.price }} руб.</p>
           <p class="card-text">{{ item.flower.description }}</p>
 
-
-
-          <!-- Кнопки +/- -->
-          <!-- Обёртка для кнопок в одну строку -->
-<div class="d-flex justify-content-center align-items-center gap-2 mt-auto">
-  <!-- Кнопка "минус" -->
-  <form method="post"
-        action="{% url 'orders:update_catalog_item_in_catalog' item.flower.id %}"
-        style="display: inline;">
-    {% csrf_token %}
-    <button type="submit" name="action" value="minus" class="btn btn-sm btn-outline-secondary">-</button>
-  </form>
-
-  <!-- Показываем текущее количество в корзине -->
-  <span class="mx-2">В корзине: {{ item.qty|default:0 }}</span>
-  <!-- Кнопка "плюс" -->
-  <form method="post"
-        action="{% url 'orders:update_catalog_item_in_catalog' item.flower.id %}"
-        style="display: inline;">
-    {% csrf_token %}
-    <button type="submit" name="action" value="plus" class="btn btn-sm btn-outline-secondary">+</button>
-  </form>
-</div>
-
-<!-- Кнопка В корзину -->
-          <p class="mt-3"></p>
-          <a href="{% url 'orders:cart' %}" class="btn btn-primary btn-sm">В корзину</a>
+          <div class="d-flex justify-content-center align-items-center gap-2 mt-auto">
+            {% if item.qty == 0 %}
+              <form method="post"
+                    action="{% url 'orders:update_catalog_item_in_catalog' item.flower.id %}">
+                {% csrf_token %}
+                <button type="submit" name="action" value="plus" class="btn btn-card">В корзину</button>
+              </form>
+            {% else %}
+              <form method="post"
+                    action="{% url 'orders:update_catalog_item_in_catalog' item.flower.id %}"
+                    style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" name="action" value="minus" class="btn btn-sm btn-outline-secondary">-</button>
+              </form>
+              <span class="mx-2">В корзине: {{ item.qty }}</span>
+              <form method="post"
+                    action="{% url 'orders:update_catalog_item_in_catalog' item.flower.id %}"
+                    style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" name="action" value="plus" class="btn btn-sm btn-outline-secondary">+</button>
+              </form>
+            {% endif %}
+          </div>
         </div>
       </div>
     </div>
   {% endfor %}
+</div>
+
+<!-- Кнопка "Оформить заказ" -->
+<div class="fixed-order-button">
+  <a href="{% url 'orders:checkout' %}" class="btn btn-order">Оформить заказ</a>
 </div>
 
 {% endblock %}
