@@ -7,7 +7,8 @@ from django.db.models import Sum, F
 from .models import Flower, Order, OrderItem
 from telegram_bot_app.bot import notify_new_order, notify_order_status
 from asgiref.sync import sync_to_async, async_to_sync
-
+from main_app.utils import check_working_hours
+from django.http import JsonResponse
 
 def catalog(request):
     """Каталог цветов с добавлением в корзину."""
@@ -215,3 +216,10 @@ def repeat_order(request, order_id):
     request.session['cart'] = cart
     messages.success(request, f"Товары из заказа #{order_id} добавлены в корзину.")
     return redirect('orders:cart')
+
+def place_order(request):
+    if not check_working_hours():
+        return JsonResponse({"error": "Прием заказов возможен только в рабочее время."}, status=403)
+
+    # Логика оформления заказа
+    return JsonResponse({"success": "Заказ успешно оформлен!"})

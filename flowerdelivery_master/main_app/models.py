@@ -17,3 +17,24 @@ class Flower(models.Model):
 
     def __str__(self):
         return self.name
+class SiteSettings(models.Model):
+    time_zone = models.CharField(
+        max_length=50,
+        default="Europe/Moscow",
+        verbose_name="Часовой пояс"
+    )
+    start_work_time = models.TimeField(
+        default="09:00",
+        verbose_name="Начало рабочего времени"
+    )
+    end_work_time = models.TimeField(
+        default="18:00",
+        verbose_name="Конец рабочего времени"
+    )
+
+    class Meta:
+        verbose_name = "Настройки сайта"
+        verbose_name_plural = "Настройки сайта"
+
+    def __str__(self):
+        return "Настройки сайта"
