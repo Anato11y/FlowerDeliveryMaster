@@ -1,6 +1,6 @@
 import os
 import django
-from telegram_bot_app.bot import TOKEN
+
 
 
 # Устанавливаем переменную окружения для настроек Django
@@ -14,12 +14,7 @@ from django.db.models import Sum, Count, F
 from telegram.ext import Application, CommandHandler
 import datetime
 from asgiref.sync import sync_to_async
-
-# Устанавливаем переменную окружения для настроек Django
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'flowerdelivery_master.settings')
-
-# Инициализируем Django
-django.setup()
+from telegram_bot_app.bot import API_TOKEN
 
 # Функция обработчика для команды /start
 async def start(update, context):
@@ -116,7 +111,7 @@ async def pending_orders(update, context):
     await update.message.reply_text(message)
 def main():
     # Создаём объект Application с вашим токеном
-    application = Application.builder().token(TOKEN).build()
+    application = Application.builder().token(API_TOKEN).build()
     # Добавляем обработчики команд
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("help", help_command))
