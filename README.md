@@ -94,7 +94,7 @@
    CHAT_ID = 'ваш ID'
 3. Запустите Telegram-бота:
    ```bash
-   python manage.py run_bot
+   python run_bot.py
 Telegram-бот будет доступен для получения уведомлений и взаимодействия.
 
 ---
