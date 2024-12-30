@@ -1,0 +1,17 @@
+# Byte-compiled files
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+
+# Virtual environment
+venv/
+.env/
+*.env
+
+# IDEs and Editors
+.idea/             # PyCharm project files
+*.iml
+.vscode/           # Visual Studio Code files
+*.sublime-project
+*.sublime-workspace
