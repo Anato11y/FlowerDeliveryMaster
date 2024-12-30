@@ -25,6 +25,7 @@ def check_working_hours():
     current_time = localtime(now(), timezone(tz)).time()
     return start_time <= current_time <= end_time
 
+
 def get_time_zone():
     try:
         settings = SiteSettings.objects.first()
