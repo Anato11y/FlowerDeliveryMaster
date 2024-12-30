@@ -9,4 +9,4 @@ class FlowerAdmin(admin.ModelAdmin):
 class OrderAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'status', 'created_at')
     list_filter = ('status', 'created_at')
-
+    search_fields = ('customer_name', 'user__username')
