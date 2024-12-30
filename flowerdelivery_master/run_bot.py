@@ -1,5 +1,7 @@
 import os
 import django
+from telegram_bot_app.bot import TOKEN
+
 
 # Устанавливаем переменную окружения для настроек Django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'flowerdelivery_master.settings')
@@ -114,8 +116,7 @@ async def pending_orders(update, context):
     await update.message.reply_text(message)
 def main():
     # Создаём объект Application с вашим токеном
-    application = Application.builder().token("7851649387:AAE0ovMqW7U3WFL6pCetd3aQLMwoJptuKwo").build()
-
+    application = Application.builder().token(TOKEN).build()
     # Добавляем обработчики команд
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("help", help_command))
